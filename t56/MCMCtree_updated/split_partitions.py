@@ -2,27 +2,26 @@
 """
 split_partitions.py
 
-Divide um alinhamento em formato PHYLIP (sequencial, estrito, nomes com 10
-caracteres) em N partições, com base nas coordenadas definidas em um arquivo
-NEXUS de "charsets" (bloco `sets`), e escreve todas as partições em um único
-arquivo PHYLIP de saída (um bloco por partição, cada um com seu próprio
-cabeçalho "ntax nchar").
+Splits an alignment in PHYLIP format (sequential, strict, 10-character taxon
+names) into N partitions, based on the coordinates defined in a NEXUS
+"charsets" file (`sets` block), and writes all partitions to a single output
+PHYLIP file (one block per partition, each with its own "ntax nchar" header).
 
-Uso:
+Usage:
     python split_partitions.py aln_10P.phy aln_10P_partitions.nex aln_10P_split.phy
 
-Formato de entrada esperado:
-  - PHYLIP estrito/sequencial: primeira linha "ntax nchar", depois uma linha
-    por táxon com os 10 primeiros caracteres reservados ao nome (padded com
-    espaços) seguidos da sequência completa, sem quebras de linha internas.
-  - NEXUS com bloco `sets` contendo linhas do tipo:
+Expected input format:
+  - Strict/sequential PHYLIP: first line "ntax nchar", then one line per
+    taxon with the first 10 characters reserved for the name (space-padded)
+    followed by the full sequence, with no internal line breaks.
+  - NEXUS with a `sets` block containing lines such as:
         charset part1 = 1-2870;
-    (coordenadas 1-based, inclusivas, como no NEXUS/RAxML).
+    (1-based, inclusive coordinates, as in NEXUS/RAxML).
 
-Formato de saída:
-  - Um único arquivo PHYLIP contendo, para cada partição, um cabeçalho
-    "ntax nchar" seguido das sequências de todos os táxons recortadas para
-    aquele intervalo de colunas, com uma linha em branco separando os blocos.
+Output format:
+  - A single PHYLIP file containing, for each partition, an "ntax nchar"
+    header followed by the sequences of all taxa trimmed to that column
+    range, with a blank line separating the blocks.
 """
 
 import re
@@ -31,10 +30,10 @@ from pathlib import Path
 
 
 def parse_phylip(path):
-    """Lê um PHYLIP sequencial estrito (nomes de 10 caracteres, 1 linha/táxon).
+    """Reads a strict sequential PHYLIP file (10-character names, 1 line/taxon).
 
-    Retorna (ntax, nchar, lista_de_tuplas(nome, sequencia)) preservando a
-    ordem original dos táxons.
+    Returns (ntax, nchar, list_of_tuples(name, sequence)) preserving the
+    original taxon order.
     """
     with open(path, "r") as fh:
         lines = [l.rstrip("\n") for l in fh if l.strip() != ""]
@@ -48,27 +47,27 @@ def parse_phylip(path):
         seq = line[10:].strip()
         if len(seq) != nchar:
             raise ValueError(
-                f"Táxon '{name}': esperado {nchar} colunas, encontrado {len(seq)}. "
-                "Verifique se o PHYLIP é estrito (nomes de 10 caracteres) e sequencial "
-                "(sequência inteira em uma única linha)."
+                f"Taxon '{name}': expected {nchar} columns, found {len(seq)}. "
+                "Check that the PHYLIP file is strict (10-character names) and sequential "
+                "(entire sequence on a single line)."
             )
         records.append((name, seq))
 
     if len(records) != ntax:
         raise ValueError(
-            f"Esperado {ntax} táxons no cabeçalho, mas {len(records)} linhas de sequência foram lidas."
+            f"Expected {ntax} taxa according to the header, but {len(records)} sequence lines were read."
         )
 
     return ntax, nchar, records
 
 
 def parse_nexus_charsets(path):
-    """Extrai os charsets do bloco `sets` de um arquivo NEXUS.
+    """Extracts the charsets from the `sets` block of a NEXUS file.
 
-    Suporta charsets com um único intervalo contíguo, ex:
+    Supports charsets with a single contiguous range, e.g.:
         charset part1 = 1-2870;
-    Retorna uma lista de tuplas (nome_particao, inicio_1based, fim_1based),
-    na ordem em que aparecem no arquivo.
+    Returns a list of tuples (partition_name, start_1based, end_1based),
+    in the order in which they appear in the file.
     """
     text = Path(path).read_text()
 
@@ -83,22 +82,22 @@ def parse_nexus_charsets(path):
         coords = match.group(2).split()
         if len(coords) != 1 or "-" not in coords[0]:
             raise ValueError(
-                f"Charset '{name}' tem coordenadas não suportadas: '{match.group(2)}'. "
-                "Este script assume um único intervalo contíguo por partição (ex: 1-2870)."
+                f"Charset '{name}' has unsupported coordinates: '{match.group(2)}'. "
+                "This script assumes a single contiguous range per partition (e.g., 1-2870)."
             )
         start_str, end_str = coords[0].split("-")
         start, end = int(start_str), int(end_str)
         charsets.append((name, start, end))
 
     if not charsets:
-        raise ValueError(f"Nenhum 'charset' encontrado em {path} (bloco 'sets').")
+        raise ValueError(f"No 'charset' found in {path} ('sets' block).")
 
     return charsets
 
 
 def write_combined_phylip(records, charsets, nchar, out_path):
-    """Escreve todas as partições em um único arquivo PHYLIP, um bloco por
-    partição, cada um com seu próprio cabeçalho 'ntax nchar_particao'.
+    """Writes all partitions to a single PHYLIP file, one block per
+    partition, each with its own 'ntax partition_nchar' header.
     """
     ntax = len(records)
 
@@ -106,19 +105,19 @@ def write_combined_phylip(records, charsets, nchar, out_path):
         for i, (name, start, end) in enumerate(charsets):
             if start < 1 or end > nchar or start > end:
                 raise ValueError(
-                    f"Charset '{name}' ({start}-{end}) fora dos limites do alinhamento "
+                    f"Charset '{name}' ({start}-{end}) is out of the alignment bounds "
                     f"(1-{nchar})."
                 )
             part_len = end - start + 1
 
             out.write(f"{ntax} {part_len}\n")
             for taxon_name, seq in records:
-                # coordenadas NEXUS são 1-based e inclusivas -> slice Python
+                # NEXUS coordinates are 1-based and inclusive -> Python slice
                 sub_seq = seq[start - 1:end]
                 padded_name = f"{taxon_name:<10}"
                 out.write(f"{padded_name} {sub_seq}\n")
 
-            # linha em branco entre blocos (exceto após o último)
+            # blank line between blocks (except after the last one)
             if i < len(charsets) - 1:
                 out.write("\n")
 
@@ -128,36 +127,36 @@ def write_combined_phylip(records, charsets, nchar, out_path):
 def main():
     if len(sys.argv) != 4:
         print(
-            "Uso: python split_partitions.py <alinhamento.phy> <particoes.nex> <saida.phy>",
+            "Usage: python split_partitions.py <alignment.phy> <partitions.nex> <output.phy>",
             file=sys.stderr,
         )
         sys.exit(1)
 
     phy_path, nex_path, out_path = sys.argv[1], sys.argv[2], sys.argv[3]
 
-    print(f"Lendo alinhamento PHYLIP: {phy_path}")
+    print(f"Reading PHYLIP alignment: {phy_path}")
     ntax, nchar, records = parse_phylip(phy_path)
-    print(f"  -> {ntax} táxons, {nchar} colunas")
+    print(f"  -> {ntax} taxa, {nchar} columns")
 
-    print(f"Lendo partições NEXUS: {nex_path}")
+    print(f"Reading NEXUS partitions: {nex_path}")
     charsets = parse_nexus_charsets(nex_path)
-    print(f"  -> {len(charsets)} partições encontradas:")
+    print(f"  -> {len(charsets)} partitions found:")
     total = 0
     for name, start, end in charsets:
         length = end - start + 1
         total += length
-        print(f"     {name}: {start}-{end} ({length} colunas)")
+        print(f"     {name}: {start}-{end} ({length} columns)")
 
     if total != nchar:
         print(
-            f"AVISO: soma das partições ({total}) difere do total de colunas "
-            f"do alinhamento ({nchar}).",
+            f"WARNING: sum of partitions ({total}) differs from the total number of "
+            f"alignment columns ({nchar}).",
             file=sys.stderr,
         )
 
-    print(f"Escrevendo arquivo combinado: {out_path}")
+    print(f"Writing combined file: {out_path}")
     write_combined_phylip(records, charsets, nchar, out_path)
-    print("Concluído.")
+    print("Done.")
 
 
 if __name__ == "__main__":
