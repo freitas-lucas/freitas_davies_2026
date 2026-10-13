@@ -1,7 +1,7 @@
 # README
 Repository with data from Freitas &amp; Davies (2026)
 
-All data used to the test the updated version of MCMCtree can be found on this repository. The table below summarises where you can find the correspondence between the tests and the folder with their results.
+All datasets used to test the updated version of MCMCtree are available in this repository. The table below lists each test alongside the folder where its results are stored.
 Test | Folder | Dataset | Source | Test | Results |
 |---------|---------|--------|------|---------|---------|
 #1 | t1 | Globin | Yang et al. (1994) | Classic mode with new control file | Identical posterior estimates |
