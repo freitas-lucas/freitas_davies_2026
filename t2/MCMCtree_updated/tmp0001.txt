@@ -1,0 +1,21 @@
+
+         5        126  P
+
+human                           AAAAAAAAAA AAAAAAAAAA AACCCDDDDD DEEEEEEEEF FFFFFGGGGG GGHHHHKKKK KLLLLLLLLL LLLLMMMNNN NNNNPPPPPP PQQRRSSSSS SSTTTTTTTV VVVVVVVVVV VVVWYY
+goat-cow                        AAAAAAAAAA AAACDDGGKN STCSVADDDD NADEEEEEEF FFFFFDGGGG GNHHNREKKK RFLLLLLLLL LLLMLMMDGK KNNNAAAPPP VQQKRANSSS SSASTTTTTL LVVVVVVVVV VVVWFY
+rabbit                          AAAAAAAAEG SSTNATGSSS AACCIEDDEN EEEEEEEEEF FFFFFAAEGG GNHHHHKKKK KLFHLLLLLL LLVLLMMNGK NNNNAPSPPP QQQRRSNGSS STKTSSTTTL VIIVVVVVVV VVVWYY
+rat                             AAAAACDEAG AGNCATDGKG AACCIDDEDS DEDADDEEQF FFILYNAGGG GGHPHHKKKK KLVHAFIILL LLLLLMMNGK NNNSAADPPS CQQRRASANS SSHTSTANTV AIVAIMMPVV VVVWFY
+marsupial                       ACETVIAAAA AAAAAKAGKK STCCIDDDDG EADEGQDEAF LYFFFTGGAG SSHPHEKAKQ KILLLLILFI LMLVLMTNGQ QHNHPDSPSP EQTKRNSSGA SSKTSTSTTL CVIVVIVVCI LTVWWY
+
+
+
+   15    1    1    1    1    1    1    1    1    1    1    1    1    1    1
+    1    1    1    1    1    1    1    1    1    1    1   10    1    1    1
+    1    1    1    1    1    1    1    5    1   10    1    1    1    1    1
+    1    1    1    2   13    1    1   14    1    2    1    1    1   17    2
+    1    1    1    1    1    1    1    1    1    1   21    4    1    1    1
+    1    1    1    1    1    1    1    4    1    1    1    1    7    2    1
+    1    3    1    1    5    1    1    1    1    1   10    1    1    1    1
+    1    1    1   10    1    1    2    1    1    1    1    1    1    1    1
+    1    1   16    3    1    5
+
