@@ -1,0 +1,13 @@
+seqfile = tmp0010.txt
+treefile = tmp0010.trees
+outfile = tmp0010.out
+noisy = 3
+seqtype = 2
+model = 2
+aaRatefile = /Users/cj25164/Documents/projects/paml/dat/lg.dat
+fix_alpha = 0
+alpha = 0.5
+ncatG = 5
+Small_Diff = 0.1e-6
+getSE = 2
+method = 0
